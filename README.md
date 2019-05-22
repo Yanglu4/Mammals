@@ -1,5 +1,5 @@
 # Project Summary
-The dataset(Weisberg,1985) contains average brain and body weights for 62 species of land mammals.<br />
+The dataset(Weisberg,1985) *mammals* contains average brain and body weights for 62 species of land mammals.<br />
 The purpose of this project is to investigate how potentially the average brain weight depends on average body weight for those species.
 <br />
 <br />
