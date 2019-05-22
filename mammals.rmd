@@ -1,0 +1,146 @@
+---
+title: "Mammals"
+author: "Yang"
+date: "May 22, 2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Load dataset
+```{r}
+library(MASS)
+data(mammals)
+attach(mammals)
+head(mammals)
+```
+
+#Baseline Model
+```{r}
+Body=mammals$body
+Brain=mammals$brain
+model_baseline<-lm(Brain~Body)
+summary(model_baseline)
+```
+
+#Take Log Transformations
+```{r}
+#take log transformations
+Log_Brain<-log(Brain)
+Log_Body<-log(Body)
+#try different model
+model1=lm(Log_Brain~Body)
+model2=lm(Brain~Log_Body)
+model3=lm(Log_Brain~Log_Body)
+bestmodel=model3#Best after log transformation
+```
+
+```{r Baseline model}
+plot(Body, Brain,main="Brain against Body")
+abline(model_baseline)
+summary(model_baseline)
+```
+
+```{r Model1}
+plot(Body, Log_Brain,main="Log Brain against Body")
+abline(model1)
+summary(model1)
+```
+
+```{r Model2}
+plot(Log_Body, Brain,main="Brain against Log Body")
+abline(model2)
+summary(model2)
+```
+
+```{r Model3}
+plot(Log_Body, Log_Brain,main="Log Brain against Log Body")
+abline(model3)
+summary(model3)
+```
+
+Based on the Adjusted R-squared value, applying log transformation to **both** Brain and Body is the best choice. The model is $log(Brain)=0.75169 log(Body)+2.13479+ \epsilon$ with $\beta_0=2.13479$ and $\beta_1=0.75169$. This means if we increase log of Body weight by 1, we expect an increment in log of Brain weight by 0.75169. And the expected log of Brain weight with log of Body weight being 0 is 2.13479.
+
+#Gamma GLM with log-link
+
+##Fit
+```{r}
+m3 <- glm(brain~log(body),family=Gamma(link="log"))
+summary(m3)
+coefficients(m3)
+plot(m3)
+```
+
+##Interpretation
+$log(E(Y|X))=\beta_0+\beta_1\cdot X$
+$\rightarrow E(Y|X)=e^{\beta_0}e^{{\beta_1} X}$ suggests that the expected value of Y given X increases by $e^{2.3670159}$.\newline
+And $E(Y|X=x)=e^{\beta_0}e^{{\beta_1}x}$
+$E(Y|X=x-1)=e^{\beta_0}e^{{\beta_1}x-1}=\frac{e^{\beta_0}e^{{\beta_1}x}}{e}$ suggests that if we change X by 1, we expect a multiplicative increase of E(Y|X) by e.
+
+#Gamma GLM with reciprocal link
+
+##Fit
+```{r}
+m4 <- glm(brain~log(body),family=Gamma(link="inverse"))
+summary(m4)
+coefficients(m4)
+plot(m4)
+```
+
+##Comparing Gamma GLM with log link(m3) and reciprocal link(m4)
+I prefer the model m3 since:\newline
+1.According to the residual plot, there is a obvious pattern of linearity in m4 in part d while the residuals distributed evenly around 0 in m3.\newline
+2.Lower AIC value of m3 than that of m4, suggesting m3 is a better fit.
+
+##Fit plot
+```{r Fitting Plot}
+x<-seq(from=-5,to=9,by=0.01)
+#model m3
+beta3<-as.numeric(coef(m3))
+y_predicted3<-exp(beta3[1]+x*beta3[2])
+#model m4
+beta4<-as.numeric(coef(m4))
+y_predicted4<-(beta4[1]+x*beta4[2])^(-1)
+plot(Log_Body,Brain)
+lines(x,y_predicted3,col="red")
+lines(x,y_predicted4,col="Blue")
+```
+
+##Comparing m3 and best model with log transformation
+
+m3:brain ~ log(body)\newline
+best_log: Log_Brain ~ Log_Body\newline
+
+```{r}
+bestmodel
+beta_best=as.numeric(coef(bestmodel))
+y_predictedbest=exp(beta_best[1]+x*beta_best[2])
+plot(Log_Body,Brain)
+lines(x,y_predictedbest,col='green')
+lines(x,y_predicted3,col='red')
+summary(bestmodel)
+summary(m3)
+```
+
+```{r}
+m3_Rsqr=1-m3$deviance/m3$null.deviance
+m3_Rsqr
+```
+The R-squared value for Log-Log model is 0.9195, which is greater than that of model3 0.8983679. Thus we prefer the log-log model we fitted from part(a).
+
+##Make prediction
+Now suppose the average body weight of a male polar bear is 450 kg, the predicted brain weight using three models above are:
+##f
+```{r}
+Body_new=log(450)
+Brain_predicted_loglog=exp(beta_best[1]+Body_new*beta_best[2])
+Brain_predicted_model3=exp(beta3[1]+Body_new*beta3[2])
+Brain_predicted_model4=(beta4[1]+Body_new*beta4[2])^-1
+```
+The predicted values from best model with log transformation,model3 and model4  are 834.659757, 1166.452784, and 212.44153 respectively. And as we discussed above according to AIC and adjusted R-square value, we would trust the best model with log transformation with predicted brain weight 834.659757.
+
+
+
+
