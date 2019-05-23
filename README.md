@@ -4,6 +4,7 @@ The dataset(Weisberg,1985) *mammals* contains average brain and body weights for
 
 # Project Summary
 The purpose of this project is to investigate how potentially the average brain weight depends on average body weight for those species.
+The code is available in file *mammals.rmd* and report in file *mammals.pdf*.
 <br />
 # Source of Dataset
 Weisberg, S. (1985) *Applied Linear Regression. 2nd edition.* Wiley, pp. 144–5.
