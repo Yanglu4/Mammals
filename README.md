@@ -3,7 +3,7 @@ The dataset(Weisberg,1985) *mammals* contains average brain and body weights for
 <br />
 
 # Project Summary
-The purpose of this project is to investigate how potentially the average brain weight depends on average body weight for those species.
+The purpose of this project is to investigate how potentially the average brain weight depends on average body weight for those species. Log transformation and Gamma GLM are models mainly used in this project. 
 The code is available in file *mammals.rmd* and report in file *mammals.pdf*.
 <br />
 # Source of Dataset
